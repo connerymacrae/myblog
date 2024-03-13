@@ -4,8 +4,8 @@ from django.contrib.auth import get_user_model
 from .models import Entry
 # Create your tests here.
 
-class EntryModelTest(TestCase):
 
+class EntryModelTest(TestCase):
 
     def test_string_representation(self):
         entry = Entry(title="My entry title")
