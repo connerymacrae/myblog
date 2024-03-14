@@ -1,23 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {% if entry_list %}
-        {% for entry in entry_list %}
-            <article>
-
-                <h2><a href="{{ entry.get_absolute_url }}">{{ entry.title }}</a></h2>
-
-                <p class="subheader">
-                    <time>{{ entry.modified_at|date }}</time>
-                </p>
-
-                <p></p>
-
-                {{ entry.body|linebreaks }}
-
-            </article>
-        {% endfor %}
-    {% else %}
+    {% for entry in entry_list %}
+        {% include "_entry.html" with entry=entry only %}
+    {% empty %}
         <p>No blog entries yet.</p>
-    {% endif %}
+    {% endfor %}
 {% endblock content %}
