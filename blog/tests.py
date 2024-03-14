@@ -78,3 +78,18 @@ class EntryViewTest(TestCase):
     def test_body_in_entry(self):
         response = self.client.get(self.entry.get_absolute_url())
         self.assertContains(response, self.entry.body)
+
+    def test_commenter_name_in_entry(self):
+        test_comment = Comment.objects.create(entry=self.entry, name='commenter-1', body='body-1')
+        test_comment.save()
+        response = self.client.get(self.entry.get_absolute_url())
+        self.assertContains(response, self.entry.comment.name)
+
+    def test_comment_body_in_entry(self):
+        Comment.objects.create(entry=self.entry, name='commenter-1', body='body-1')
+        response = self.client.get(self.entry.get_absolute_url())
+        self.assertContains(response, self.entry.comment_set.body)
+
+    def test_no_comment_response(self):
+        response = self.client.get(self.entry.get_absolute_url())
+        self.assertContains(response, "No comments yet.")
