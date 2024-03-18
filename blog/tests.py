@@ -80,10 +80,12 @@ class EntryViewTest(TestCase):
         self.assertContains(response, self.entry.body)
 
     def test_commenter_name_in_entry(self):
+        print(f"entry: {self.entry}")
         test_comment = Comment.objects.create(entry=self.entry, name='commenter-1', body='body-1')
         test_comment.save()
+        print(f"comment: {test_comment}")
         response = self.client.get(self.entry.get_absolute_url())
-        self.assertContains(response, self.entry.comment.name)
+        self.assertContains(response, self.entry.comment_set.name)
 
     def test_comment_body_in_entry(self):
         Comment.objects.create(entry=self.entry, name='commenter-1', body='body-1')
