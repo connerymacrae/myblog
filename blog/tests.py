@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
-from .models import Entry
+from .models import Entry, Comment
 # Create your tests here.
 
 
@@ -18,6 +18,13 @@ class EntryModelTest(TestCase):
         user = get_user_model().objects.create(username='some_user')
         entry = Entry.objects.create(title="My entry title", author=user)
         self.assertIsNotNone(entry.get_absolute_url())
+
+
+class CommentModelTest(TestCase):
+
+    def test_string_representation(self):
+        comment = Comment(body="My comment body")
+        self.assertEqual(str(comment), "My comment body")
 
 
 class ProjectTests(TestCase):
@@ -71,3 +78,18 @@ class EntryViewTest(TestCase):
     def test_body_in_entry(self):
         response = self.client.get(self.entry.get_absolute_url())
         self.assertContains(response, self.entry.body)
+
+    def test_commenter_name_in_entry(self):
+        test_comment = Comment.objects.create(entry=self.entry, name='commenter-1', body='body-1')
+        test_comment.save()
+        response = self.client.get(self.entry.get_absolute_url())
+        self.assertContains(response, self.entry.comment_set.first().name)
+
+    def test_comment_body_in_entry(self):
+        Comment.objects.create(entry=self.entry, name='commenter-1', body='body-1')
+        response = self.client.get(self.entry.get_absolute_url())
+        self.assertContains(response, self.entry.comment_set.first().body)
+
+    def test_no_comment_response(self):
+        response = self.client.get(self.entry.get_absolute_url())
+        self.assertContains(response, "No comments yet.")
