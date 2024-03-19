@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django_webtest import WebTest
 
 
 from blog.forms import CommentForm
@@ -62,7 +63,7 @@ class HomePageTests(TestCase):
         self.assertContains(response, 'No blog entries yet.')
 
 
-class EntryViewTest(TestCase):
+class EntryViewTest(WebTest):
 
     def setUp(self):
         self.user = get_user_model().objects.create(username='some_user')
@@ -97,6 +98,24 @@ class EntryViewTest(TestCase):
         response = self.client.get(self.entry.get_absolute_url())
         self.assertContains(response, "No comments yet.")
 
+    def test_view_page(self):
+        page = self.app.get(self.entry.get_absolute_url())
+        self.assertEqual(len(page.forms), 1)
+
+    def test_form_error(self):
+        page = self.app.get(self.entry.get_absolute_url())
+        page = page.form.submit()
+        self.assertContains(page, "This field is required.")
+
+    def test_form_success(self):
+        page = self.app.get(self.entry.get_absolute_url())
+        page.form['name'] = "Phillip"
+        page.form['email'] = "phillip@example.com"
+        page.form['body'] = "Test comment body."
+        page = page.form.submit()
+        self.assertRedirects(page, self.entry.get_absolute_url())
+
+
 class CommentFormTest(TestCase):
 
     def setUp(self):
@@ -127,7 +146,7 @@ class CommentFormTest(TestCase):
         form = CommentForm({}, entry=self.entry)
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors, {
-            'name': ['required'],
-            'email': ['required'],
-            'body': ['required'],
+            'name': ['This field is required.'],
+            'email': ['This field is required.'],
+            'body': ['This field is required.'],
         })
