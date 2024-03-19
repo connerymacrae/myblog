@@ -1,5 +1,6 @@
 asgiref==3.7.2
 beautifulsoup4==4.12.3
+coverage==7.4.4
 Django==4.2.11
 django-webtest==1.9.11
 soupsieve==2.5
