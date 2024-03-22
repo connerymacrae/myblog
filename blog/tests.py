@@ -164,3 +164,14 @@ class EntryHistoryTagTest(TestCase):
         entry = Entry.objects.create(author=self.user, title="My entry title")
         rendered = self.TEMPLATE.render(Context({}))
         self.assertIn(entry.title, rendered)
+
+    def test_no_posts(self):
+        rendered = self.TEMPLATE.render(Context({}))
+        self.assertIn("No recent entries", rendered)
+
+    def test_many_posts(self):
+        for n in range(1, 6):
+            Entry.objects.create(author=self.user, title="Post #{0}".format(n))
+        rendered = self.TEMPLATE.render(Context({}))
+        self.assertIn("Post #5", rendered)
+        self.assertNotIn("Post #6", rendered)
